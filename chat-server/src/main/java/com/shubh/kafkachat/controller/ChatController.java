@@ -24,31 +24,14 @@ public class ChatController {
 
     @PostMapping(value = "/api/send", consumes = "application/json", produces = "application/json")
     public void sendMessage(@RequestBody Message message) {
-        System.out.println("Kafka message");
-        System.out.println(message);
         message.setDate(LocalDateTime.now().toString());
         try {
             //Sending the message to kafka topic queue
             kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, message).get();
+
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    //    -------------- WebSocket API ----------------
-
-    // WebSocket API
-    @MessageMapping("/message")
-    @SendTo("/chatroom/public")
-    public Message receiveMessage(@Payload Message message){
-        return message;
-    }
-
-    @MessageMapping("/private-message")
-    public Message recMessage(@Payload Message message){
-        simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(),"/private",message);
-        System.out.println(message.toString());
-        return message;
     }
 
 }
