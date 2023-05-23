@@ -36,7 +36,11 @@ const ChatRoom = () => {
             senderName: userData.username,
             status:"JOIN"
           };
-          stompClient.send("/app/message", {}, JSON.stringify(chatMessage));
+          chatAPI.sendMessage(chatMessage).then(res => {
+            console.log('Sent', res);
+          }).catch(err => {
+            console.log('Error Occured while sending message to api');
+          })
     }
 
     const onMessageReceived = (payload)=>{
@@ -86,9 +90,8 @@ const ChatRoom = () => {
                 status:"MESSAGE"
               };
               console.log(chatMessage);
-              stompClient.send("/app/message", {}, JSON.stringify(chatMessage));
               setUserData({...userData,"message": ""});
-              chatAPI.sendMessage(userData.username, null, userData.message).then(res => {
+              chatAPI.sendMessage(chatMessage).then(res => {
                 console.log('Sent', res);
               }).catch(err => {
                 console.log('Error Occured while sending message to api');
@@ -109,9 +112,8 @@ const ChatRoom = () => {
             privateChats.get(tab).push(chatMessage);
             setPrivateChats(new Map(privateChats));
           }
-          stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
           setUserData({...userData,"message": ""});
-          chatAPI.sendMessage(userData.username, tab, userData.message).then(res => {
+          chatAPI.sendMessage(chatMessage).then(res => {
             console.log('Sent', res);
           }).catch(err => {
             console.log('Error Occured while sending message to api');
